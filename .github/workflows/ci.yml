@@ -33,5 +33,5 @@ jobs:
 
       - name: Build Email Service
         run: |
-          cd email-service
+          cd email-notification-service
           mvn clean package -DskipTests
