@@ -1,0 +1,59 @@
+package com.learning.service;
+
+import static com.learning.config.RabbitMQConfig.ORDER_EXCHANGE;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.learning.entity.Order;
+import com.learning.entity.OrderStatus;
+import com.learning.event.OrderCreatedEvent;
+import com.learning.repo.OrderRepo;
+
+@Service
+public class OrderService {
+
+	private final OrderRepo orderRepo;
+	private final RabbitTemplate rabbitTemplate;
+
+	public OrderService(OrderRepo orderRepo, RabbitTemplate rabbitTemplate) {
+		super();
+		this.orderRepo = orderRepo;
+		this.rabbitTemplate=rabbitTemplate;
+	}
+	
+//	public List<Order> getOrdersByUserId(Long userId){
+//		return orderRepo.findByUserId(userId);
+//	}
+	
+	public Order createOrder(Order order) {
+		order.setStatus(OrderStatus.NEW);
+		String userEmail="user"+order.getId()+"@gmailcom";
+		System.out.println("in order service user email is: "+userEmail);
+		Order savedOrder=orderRepo.save(order);
+		Double accountBalance=(double) (Math.random()>0.5?(3*500):5);
+		OrderCreatedEvent event=new OrderCreatedEvent(
+				savedOrder.getId(),
+				savedOrder.getProductId(),
+				savedOrder.getQuantity(),
+				savedOrder.getPrice(),
+				userEmail,
+				accountBalance,
+				LocalDateTime.now()
+				);
+		rabbitTemplate.convertAndSend(ORDER_EXCHANGE, "order.created", event);
+		return savedOrder;
+	}
+	
+	public Order getOrder(Long id) {
+		return orderRepo.findById(id).orElseThrow(()-> new RuntimeException("order not found"));
+	}
+	
+	public List<Order> getAllOrders(){
+		return orderRepo.findAll();
+	}
+}

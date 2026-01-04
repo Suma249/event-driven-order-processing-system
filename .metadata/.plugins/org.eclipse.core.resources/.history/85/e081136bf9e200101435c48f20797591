@@ -1,0 +1,36 @@
+package com.learning.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.learning.entity.Order;
+import com.learning.repo.OrderRepo;
+
+@Service
+public class OrderService {
+
+	@Autowired
+	private final OrderRepo orderRepo;
+
+	public OrderService(OrderRepo orderRepo) {
+		super();
+		this.orderRepo = orderRepo;
+	}
+	
+	public List<Order> getOrdersByUserId(Long userId){
+		return orderRepo.findByUserId(userId);
+	}
+	public Order createOrder(Order order) {
+		return orderRepo.save(order);
+	}
+	
+	public Order getOrder(Long id) {
+		return orderRepo.findById(id).orElseThrow(()-> new RuntimeException("order not found"));
+	}
+	
+	public List<Order> getAllOrders(){
+		return orderRepo.findAll();
+	}
+}

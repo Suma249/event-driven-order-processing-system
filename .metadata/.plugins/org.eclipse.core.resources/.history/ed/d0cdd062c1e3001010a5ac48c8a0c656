@@ -1,0 +1,5 @@
+package com.learning.event;
+
+public class OrderCreatedEvent {
+
+}

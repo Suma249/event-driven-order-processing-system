@@ -1,0 +1,28 @@
+package com.learning.event;
+
+import java.time.LocalDateTime;
+
+import java.time.LocalDateTime;
+
+public class OrderCreatedEvent {
+
+	private Long orderId;
+	private Long productId;
+	private Integer quantity;
+	private Double price;
+	private LocalDateTime createdAt;
+	
+	public OrderCreatedEvent(Long orderId, Long productId, Integer quantity, Double price, LocalDateTime createdAt) {
+		super();
+		this.orderId = orderId;
+		this.productId = productId;
+		this.quantity = quantity;
+		this.price = price;
+		this.createdAt = createdAt;
+	}
+
+	public OrderCreatedEvent() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+}

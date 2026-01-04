@@ -1,0 +1,31 @@
+package com.learning.listener;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import com.learning.entity.Order;
+import com.learning.entity.OrderStatus;
+import com.learning.event.PaymentCompletedEvent;
+import com.learning.repo.OrderRepo;
+
+@Component
+public class PaymentEventListener {
+
+private final OrderRepo orderRepo;
+	
+	public PaymentEventListener(OrderRepo orderRepo) {
+		super();
+		this.orderRepo = orderRepo;
+	}
+
+	@RabbitListener(queues="order.payment.queue")
+	public void handleOrderCreated(PaymentCompletedEvent event) {
+		System.out.println("order service received PaymentCompletedEvent for orderId: "+event.getOrderId());
+		Order order=orderRepo.findById(event.getOrderId()).orElseThrow();
+		if("SUCCESS".equals(event.getPaymentStatus()))
+			order.setStatus(OrderStatus.CONFIRMED);
+		else 
+			order.setStatus(OrderStatus.CANCELLED);
+		orderRepo.save(order);
+	}
+}

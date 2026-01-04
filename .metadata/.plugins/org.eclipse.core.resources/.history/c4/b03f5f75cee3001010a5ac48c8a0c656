@@ -1,0 +1,17 @@
+package com.learning.config;
+
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitMQConfig {
+
+	public static final String ORDER_EXCHANGE="order.events";
+	
+	@Bean
+	public Exchange orderExchange() {
+		return new TopicExchange(ORDER_EXCHANGE);
+	}
+}

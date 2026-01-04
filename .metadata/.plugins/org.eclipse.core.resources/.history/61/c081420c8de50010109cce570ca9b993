@@ -1,0 +1,32 @@
+package com.learning.listener;
+
+import java.time.LocalDateTime;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Component;
+
+import com.learning.event.OrderCreatedEvent;
+import com.learning.event.PaymentCompletedEvent;
+
+@Component
+public class OrderEventListener {
+
+	private final RabbitTemplate rabbitTemplate;
+	
+	public OrderEventListener(RabbitTemplate rabbitTemplate) {
+		super();
+		this.rabbitTemplate = rabbitTemplate;
+	}
+
+
+	@RabbitListener(queues="payment.queue")
+	public void handleOrderCreated(OrderCreatedEvent event) {
+		System.out.println("payment service received OrderCreatedEvent "+"orderId="+event.getOrderId()+", price= "+event.getPrice());
+		String status=event.getPrice()<=event.getAccountBalance()? "SUCCESS":"FAILED";
+		
+		PaymentCompletedEvent paymentEvent=new PaymentCompletedEvent(event.getOrderId(), status, LocalDateTime.now());
+		rabbitTemplate.convertAndSend("order.events","payment.completed", paymentEvent);
+		System.out.println("paymentcomplete event published for orderid: "+event.getOrderId());
+	}
+}

@@ -1,0 +1,5 @@
+package com.learning.listener;
+
+public class EmailEventListener {
+
+}

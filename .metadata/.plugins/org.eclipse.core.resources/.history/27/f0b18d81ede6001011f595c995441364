@@ -1,0 +1,55 @@
+package com.learning.controller;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import static com.learning.config.RabbitMQConfig.ORDER_EXCHANGE;
+
+import com.learning.entity.Order;
+import com.learning.entity.OrderStatus;
+import com.learning.event.OrderCreatedEvent;
+import com.learning.service.OrderService;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+	private OrderService orderService;
+	
+	public OrderController(OrderService orderService) {
+		super();
+		this.orderService = orderService;
+	}
+	
+	@PostMapping("/createOrder")
+	public Order createOrder(@RequestBody Order order){
+		System.out.println("request received for create order end point, and the request is: \n");
+		String userEmail="user"+order.getId()+"@gmailcom";
+		System.out.println("in order controller user email is: "+userEmail);
+		Order savedOrder=orderService.createOrder(order);
+		System.out.println("successfuuly produced the order event: "+order.getId()+"to "+ORDER_EXCHANGE);
+		return savedOrder;
+	}
+
+	@GetMapping
+	public List<Order> getAllOrders(){
+		return orderService.getAllOrders();
+	}
+	
+//	@GetMapping("/users/{userId}")
+//	public List<Order> getOrdersByUser(Long userId){
+//		return orderService.getOrdersByUserId(userId);
+//	}
+//	@GetMapping("/{id}")
+//	public ResponseEntity<Object> getOrder(@PathVariable Long id){
+//		return new ResponseEntity(orderService.getOrder(id), HttpStatus.OK);
+//	}
+}
