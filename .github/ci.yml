@@ -1,0 +1,37 @@
+name: CI-Build Microservices
+
+on:
+   push:
+      branches:
+        - main
+   pull_request:
+     branches:
+       - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Order Service
+        run: |
+          cd order-service
+          mvn clean package -DskipTests
+      - name: Build Payment Service
+        run: |
+          cd payment-service
+          mvn clean package -DskipTests
+
+      - name: Build Email Service
+        run: |
+          cd email-service
+          mvn clean package -DskipTests
