@@ -46,4 +46,4 @@ jobs:
 
       - name: Build Email Service Docker Image
         run: |
-          docker build -t email-service:ci email-service
+          docker build -t email-service:ci email-notification-service
